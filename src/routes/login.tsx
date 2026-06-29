@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
   Check,
+  Loader2,
   Lock,
   Mail,
   Shield,
@@ -30,6 +31,16 @@ import {
   type SignupSchema,
 } from "@/features/auth/schemas";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useLogin, useRegister, type LoginError } from "@/features/auth/hooks";
+import { toast } from "sonner";
+import type { UseMutationResult } from "@tanstack/react-query";
+import type {
+  AuthResponse,
+  LoginPayload,
+  RegisterPayload,
+  RegisterResponse,
+  ValidationErrorResponse,
+} from "@/features/auth/types";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -39,6 +50,8 @@ type Mode = "signin" | "signup";
 
 function Login() {
   const [mode, setMode] = useState<Mode>("signup");
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
   const loginForm = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
@@ -74,11 +87,34 @@ function Login() {
   ];
 
   function onLoginSubmit(data: LoginSchema) {
-    console.log("LOGIN:", data);
+    loginMutation.mutate(data, {
+      onError: (error) => {
+        if (error.errors) {
+          error.errors.forEach(
+            ({ field, message }: { field: string; message: string }) => {
+              loginForm.setError(field as keyof LoginSchema, { message });
+            }
+          );
+        } else if (error.statusCode === 401) {
+          toast.error(error.message || "Invalid credentials");
+        }
+      },
+    });
   }
 
   function onSignupSubmit(data: SignupSchema) {
     console.log("SIGNUP:", data);
+    registerMutation.mutate(data, {
+      onError(error) {
+        if (error.errors) {
+          error.errors.forEach(
+            ({ field, message }: { field: string; message: string }) => {
+              signupForm.setError(field as keyof SignupSchema, { message });
+            }
+          );
+        }
+      },
+    });
   }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
@@ -218,9 +254,17 @@ function Login() {
               </Button>
             </div>
             {mode === "signin" ? (
-              <SigninForm form={loginForm} onSubmit={onLoginSubmit} />
+              <SigninForm
+                form={loginForm}
+                onSubmit={onLoginSubmit}
+                loginMutation={loginMutation}
+              />
             ) : (
-              <SignupForm form={signupForm} onSubmit={onSignupSubmit} />
+              <SignupForm
+                form={signupForm}
+                onSubmit={onSignupSubmit}
+                registerMutation={registerMutation}
+              />
             )}
 
             <div className="relative my-6">
@@ -315,15 +359,13 @@ function Login() {
 function SigninForm({
   form,
   onSubmit,
+  loginMutation,
 }: {
   form: UseFormReturn<LoginSchema>;
   onSubmit: (data: LoginSchema) => void;
+  loginMutation: UseMutationResult<AuthResponse, LoginError, LoginPayload>;
 }) {
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting, isSubmitSuccessful },
-  } = form;
+  const { control, handleSubmit } = form;
 
   return (
     <form
@@ -389,15 +431,15 @@ function SigninForm({
 
       <Button
         type="submit"
-        disabled={isSubmitting}
+        disabled={loginMutation.isPending}
         className="group relative w-full py-3.5 rounded-xl font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden"
       >
-        {isSubmitting ? (
+        {loginMutation.isPending ? (
           <>
-            <div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
-            <span>Please wait...</span>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span> Please wait...</span>
           </>
-        ) : isSubmitSuccessful ? (
+        ) : loginMutation.isSuccess ? (
           <>
             <Check className="w-4 h-4" strokeWidth={3} />
             <span>Success!</span>
@@ -420,15 +462,17 @@ function SigninForm({
 function SignupForm({
   form,
   onSubmit,
+  registerMutation,
 }: {
   form: UseFormReturn<SignupSchema>;
   onSubmit: (data: SignupSchema) => void;
+  registerMutation: UseMutationResult<
+    RegisterResponse,
+    ValidationErrorResponse,
+    RegisterPayload
+  >;
 }) {
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting, isSubmitSuccessful },
-  } = form;
+  const { control, handleSubmit } = form;
 
   return (
     <form
@@ -555,15 +599,15 @@ function SignupForm({
 
       <Button
         type="submit"
-        disabled={isSubmitting}
+        disabled={registerMutation.isPending}
         className="group relative w-full py-3.5 rounded-xl font-semibold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden"
       >
-        {isSubmitting ? (
+        {registerMutation.isPending ? (
           <>
-            <div className="w-4 h-4 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
             <span>Please wait...</span>
           </>
-        ) : isSubmitSuccessful ? (
+        ) : registerMutation.isSuccess ? (
           <>
             <Check className="w-4 h-4" strokeWidth={3} />
             <span>Success!</span>
