@@ -118,11 +118,11 @@ function Login() {
     });
   }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 sm:p-6 overflow-y-auto">
       <div className="relative w-full max-w-5xl auth-transition">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] rounded-2xl bg-surface-container-lowest executive-border shadow-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] rounded-2xl bg-surface-container-lowest executive-border shadow-2xl">
           {/* Left: Brand panel */}
-          <div className="relative hidden lg:flex flex-col justify-between p-10">
+          <div className="relative flex flex-col justify-between p-10">
             <div className="absolute inset-0 opacity-30 pointer-events-none">
               <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/20 blur-3xl" />
               <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full blur-3xl" />
@@ -180,7 +180,7 @@ function Login() {
             </div>
 
             <div className="relative flex items-center gap-3 pt-6 border-t border-outline-variant/40">
-              <div className="flex -space-x-2">
+              <div className="flex -space-x-2 shrink-0">
                 {[
                   "https://i.pravatar.cc/40?img=12",
                   "https://i.pravatar.cc/40?img=32",
@@ -194,7 +194,7 @@ function Login() {
                   />
                 ))}
               </div>
-              <p className="text-xs">
+              <p className="text-xs min-w-0">
                 <span className="font-semibold">10,000+</span> active buyers &
                 sellers in the UAE
               </p>
@@ -202,7 +202,7 @@ function Login() {
           </div>
 
           {/* Right: Form panel */}
-          <div className="relative bg-surface-container-lowest p-8 sm:p-10 flex flex-col">
+          <div className="relative p-8 sm:p-10 flex flex-col">
             <button
               // onClick={onClose}
               className="absolute top-5 right-5 w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
@@ -210,18 +210,6 @@ function Login() {
             >
               <X className="w-5 h-5" />
             </button>
-
-            <div className="lg:hidden flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" strokeWidth={2.5} />
-              </div>
-              <span className="font-headline text-xl font-bold">
-                Marketplace
-              </span>
-              <span className="">
-                <ThemeToggle />
-              </span>
-            </div>
 
             <div className="mb-8">
               <h1 className="font-headline text-3xl font-bold tracking-tight">
