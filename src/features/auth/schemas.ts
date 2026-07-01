@@ -22,24 +22,55 @@ export const signupSchema = z
     password: z
       .string()
       .min(8, "Password must be at least 8 characters")
-      .max(100)
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain uppercase, lowercase, and a number"
-      ),
+      .max(100),
+    // .regex(
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    //   "Password must contain uppercase, lowercase, and a number"
+    // ),
     confirmPassword: z
       .string()
       .min(8, "Password must be at least 8 characters")
-      .max(100)
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Password must contain uppercase, lowercase, and a number"
-      ),
+      .max(100),
+    // .regex(
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    //   "Password must contain uppercase, lowercase, and a number"
+    // ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
+export const resetSchema = z
+  .object({
+    token: z.string(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(100),
+    // .regex(
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    //   "Password must contain uppercase, lowercase, and a number"
+    // ),
+    confirmPassword: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(100),
+    // .regex(
+    //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+    //   "Password must contain uppercase, lowercase, and a number"
+    // ),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("Please enter a valid email address"),
+});
+
 export type LoginSchema = z.infer<typeof loginSchema>;
+export type ResetSchema = z.infer<typeof resetSchema>;
+export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 export type SignupSchema = z.infer<typeof signupSchema>;

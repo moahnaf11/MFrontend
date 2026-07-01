@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
 import "./index.css";
 
 // Import the generated route tree
@@ -27,6 +29,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </StrictMode>
   );

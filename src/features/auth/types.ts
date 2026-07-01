@@ -30,6 +30,7 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   roles: UserRole[];
+  emailVerifiedAt: Date | null;
 }
 
 export interface AuthResponse {
@@ -43,4 +44,20 @@ export interface FieldError {
 
 export interface ValidationErrorResponse {
   errors: FieldError[];
+}
+
+export interface RequestEmailVerificationPayload {
+  email: string;
+}
+
+export interface GenericAuthMessage {
+  message: string;
+}
+
+export interface VerifyEmailPayload {
+  token: string;
+}
+
+export interface VerifyEmailResponse {
+  message: string;
 }

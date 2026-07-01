@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Check,
+  Eye,
+  EyeOff,
   Loader2,
   Lock,
   Mail,
@@ -45,7 +47,7 @@ import type {
 export const Route = createFileRoute("/login")({
   component: Login,
 });
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 type Mode = "signin" | "signup";
 
 function Login() {
@@ -103,7 +105,6 @@ function Login() {
   }
 
   function onSignupSubmit(data: SignupSchema) {
-    console.log("SIGNUP:", data);
     registerMutation.mutate(data, {
       onError(error) {
         if (error.errors) {
@@ -117,9 +118,9 @@ function Login() {
     });
   }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       <div className="relative w-full max-w-5xl auth-transition">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] overflow-hidden rounded-2xl bg-surface-container-lowest executive-border shadow-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] rounded-2xl bg-surface-container-lowest executive-border shadow-2xl">
           {/* Left: Brand panel */}
           <div className="relative hidden lg:flex flex-col justify-between p-10">
             <div className="absolute inset-0 opacity-30 pointer-events-none">
@@ -172,6 +173,10 @@ function Login() {
                   </div>
                 ))}
               </div>
+              <p className="text-xs text-primary">
+                A % of marketplace earnings will go to charity organizations
+                across the UAE.
+              </p>
             </div>
 
             <div className="relative flex items-center gap-3 pt-6 border-t border-outline-variant/40">
@@ -282,6 +287,9 @@ function Login() {
               {[
                 {
                   name: "Google",
+                  onClick: () => {
+                    window.location.href = `${BASE_URL}/auth/google`;
+                  },
                   svg: (
                     <svg viewBox="0 0 24 24" className="w-5 h-5">
                       <path
@@ -321,6 +329,7 @@ function Login() {
                 // },
               ].map((p) => (
                 <Button
+                  onClick={p.onClick}
                   key={p.name}
                   type="button"
                   className="border border-black flex items-center justify-center py-3 rounded-xl hover:border-primary/40 transition-all"
@@ -366,6 +375,7 @@ function SigninForm({
   loginMutation: UseMutationResult<AuthResponse, LoginError, LoginPayload>;
 }) {
   const { control, handleSubmit } = form;
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <form
@@ -404,24 +414,35 @@ function SigninForm({
             <Field data-invalid={fieldState.invalid}>
               <div className="flex items-center justify-between">
                 <FieldLabel htmlFor="signin-password">Password</FieldLabel>
-                <button
-                  type="button"
+                <Link
+                  to="/forgot-password"
                   className="text-xs font-medium text-primary hover:text-primary-fixed-dim transition-colors"
                 >
                   Forgot?
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-outline pointer-events-none" />
                 <Input
                   {...field}
                   id="signin-password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   aria-invalid={fieldState.invalid}
                   placeholder="••••••••"
                   autoComplete="current-password"
                   className="pl-11"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -473,6 +494,8 @@ function SignupForm({
   >;
 }) {
   const { control, handleSubmit } = form;
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <form
@@ -559,12 +582,23 @@ function SignupForm({
                 <Input
                   {...field}
                   id="signup-password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   aria-invalid={fieldState.invalid}
                   placeholder="••••••••"
                   autoComplete="new-password"
                   className="pl-11"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -584,12 +618,23 @@ function SignupForm({
                 <Input
                   {...field}
                   id="signup-confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   aria-invalid={fieldState.invalid}
                   placeholder="••••••••"
                   autoComplete="new-password"
                   className="pl-11"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
               </div>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
